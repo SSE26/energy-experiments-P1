@@ -3,19 +3,20 @@ import time
 import os
 
 DURATION = 10  # seconds
-URL = "https://www.instagram.com/reels/"
+URL = "https://www.instagram.com/reels/DVEG4s9CLSX/" # example reel URL to start doomscrolling
+# URL1 = "https://www.instagram.com/reels/"
 AUTH_FILE = "auth_state.json"
 OUTPUT_DIR = "measurements"
 
-def save_auth_state(browser, context, auth_file):
-    """Save authentication state for reuse"""
-    context.storage_state(path=auth_file)
+# def save_auth_state(browser, context, auth_file):
+#     """Save authentication state for reuse"""
+#     context.storage_state(path=auth_file)
 
-def load_auth_state(browser, auth_file):
-    """Load saved authentication state if it exists"""
-    if os.path.exists(auth_file):
-        return browser.new_context(storage_state=auth_file)
-    return browser.new_context()
+# def load_auth_state(browser, auth_file):
+#     """Load saved authentication state if it exists"""
+#     if os.path.exists(auth_file):
+#         return browser.new_context(storage_state=auth_file)
+#     return browser.new_context()
 
 # Create output directory if it doesn't exist
 os.makedirs(OUTPUT_DIR, exist_ok=True)

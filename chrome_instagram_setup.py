@@ -29,7 +29,6 @@ with sync_playwright() as p:
         headless=False,
         args=[
             "--disable-extensions",
-            "--start-fullscreen",
         ],
     )
 
@@ -44,6 +43,7 @@ with sync_playwright() as p:
 
     print("Navigating...")
     page.goto(URL, wait_until="networkidle")
+    page.keyboard.press("F11")  # enter fullscreen
 
     # Decline cookies — longer timeout so the banner has time to appear
     try:
@@ -70,6 +70,14 @@ with sync_playwright() as p:
     # Scroll every SCROLL_INTERVAL seconds for DURATION seconds
     for i in range(DURATION // SCROLL_INTERVAL):
         time.sleep(SCROLL_INTERVAL)
+
+        # Dismiss login popup if it appears
+        try:
+            page.click("svg[aria-label='Close']", timeout=500)
+            print("  ✕ Login popup dismissed.")
+        except:
+            pass
+
         page.keyboard.press("ArrowDown")
         print(f"  → Reel {i + 2} at t={SCROLL_INTERVAL * (i + 1)} s")
 

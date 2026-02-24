@@ -3,10 +3,10 @@ import os
 import time
 
 READY_SIGNAL = ".measurement_ready"
-OUTPUT_FILE = "SSE_P1/measurements/instagram_exp.csv"
+OUTPUT_FILE = "energy-experiments-P1/measurements/instagram_exp.csv"
 
 # 1. Start setup in the background
-setup = subprocess.Popen(["python", "SSE_P1/chrome_instagram_setup.py"])
+setup = subprocess.Popen(["python", "energy-experiments-P1/chrome_instagram_setup.py"])
 
 # 2. Wait for the ready signal
 print("Waiting for browser setup...")
@@ -20,7 +20,7 @@ subprocess.run([
     "--summary",
     "-o", OUTPUT_FILE,
     "--",
-    "python", "SSE_P1/chrome_instagram_measure.py"
+    "python", "energy-experiments-P1/chrome_instagram_measure.py"
 ])
 
 # 4. Wait for setup to finish closing the browser

@@ -9,7 +9,7 @@ Clone this repository into the directory where you have cloned [EnergiBridge](ht
     source venv/bin/activate  # For linux
     # On Windows: venv\Scripts\activate
     ```
-3. Install dependencies:
+3. Install dependencies (Python 3.13):
     ```bash
     pip install -r requirements.txt
     ```

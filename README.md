@@ -78,8 +78,8 @@ Running this script performs the following sequence:
 ```
 ### Key Points
 1. Setup is NOT measured: all the browser setup, popups, unmuting happens outside the energy measurement window.
-2. Only the sleep(DURATION) in `chrome_measure.py` is measured - this is the "doomscrolling" window that energibridge captures.
-3. Synchronization - the `.measurement_ready` flag ensures measurement starts only after browser is fully ready.
-4. Cleanup - setup.py continues scrolling during measurement and cleans up after.
+2. Only the sleep(DURATION) in `chrome_measure.py` is measured: this is the "doomscrolling" window that energibridge captures.
+3. Synchronization: the `.measurement_ready` flag ensures measurement starts only after browser is fully ready.
+4. Cleanup: setup.py continues scrolling during measurement and cleans up after.
 
 This ensures clean, consistent energy measurements for just the doomscrolling behaviour.

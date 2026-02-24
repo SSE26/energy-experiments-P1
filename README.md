@@ -13,7 +13,21 @@ Clone this repository into the directory where you have cloned [EnergiBridge](ht
     ```bash
     pip install -r requirements.txt
     ```
-4. Run scripts using a singular controller:
+4. Run the experiment on Chrome:
+    ```bash
+    python chrome.py [platform]
+    ```
+    Where `[platform]` is one of:
+    - `tiktok` — opens TikTok, closes popups/banners, unmutes, then scrolls every 10 s for 60 s
+    - `youtube` — opens YouTube Shorts, declines cookies, unmutes, then clicks next video every 10 s for 60 s
+
+    Examples:
+    ```bash
+    python chrome.py tiktok
+    python chrome.py youtube
+    ```
+
+    Alternatively, run scripts using a singular controller:
     ```bash
         python run_experiment.py
     ```

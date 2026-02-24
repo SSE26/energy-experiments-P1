@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 venv/
 geckodriver-v0.36.0-linux64.tar.gz
+.measurement_ready

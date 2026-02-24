@@ -1,4 +1,6 @@
-playwright==1.40.0
-pandas==2.0.0
-matplotlib==3.8.0
-numpy==1.24.0
+numpy>=2.1
+pandas>=2.2
+matplotlib>=3.8
+playwright>=1.40
+selenium>=4.15
+Python>=3.12

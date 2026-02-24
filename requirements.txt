@@ -3,4 +3,4 @@ pandas>=2.2
 matplotlib>=3.8
 playwright>=1.40
 selenium>=4.15
-
+scipy>=1.13

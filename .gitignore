@@ -1,4 +1,4 @@
-measurements/
+measurements*/
 auth_state.json
 __pycache__/
 *.pyc

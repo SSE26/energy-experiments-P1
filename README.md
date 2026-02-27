@@ -9,7 +9,7 @@ Clone this repository into the directory where you have cloned [EnergiBridge](ht
     source venv/bin/activate  # For linux
     # On Windows: venv\Scripts\activate
     ```
-3. Install dependencies:
+3. Install dependencies (Python 3.13):
     ```bash
     pip install -r requirements.txt
     ```
@@ -83,3 +83,4 @@ Running this script performs the following sequence:
 4. Cleanup: setup.py continues scrolling during measurement and cleans up after.
 
 This ensures clean, consistent energy measurements for just the doomscrolling behaviour.
+    The setup.py and measure.py can be altered for various social media platforms and browsers.

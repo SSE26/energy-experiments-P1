@@ -84,3 +84,13 @@ Running this script performs the following sequence:
 
 This ensures clean, consistent energy measurements for just the doomscrolling behaviour.
     The setup.py and measure.py can be altered for various social media platforms and browsers.
+
+## Analysis
+
+To run analysis:
+
+```
+python analyze_experiment.py
+```
+The results will be stored in analysis/.
+

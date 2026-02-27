@@ -71,12 +71,13 @@ def _shapiro(series: np.ndarray, alpha: float) -> tuple[float, float, bool]:
 def _remove_outliers(series: np.ndarray) -> np.ndarray:
     if series.size == 0:
         return series
-    mean = float(np.mean(series))
-    std = float(np.std(series, ddof=0))
-    if std == 0:
+    q1, q3 = np.percentile(series, [25, 75])
+    iqr = float(q3 - q1)
+    if iqr == 0:
         return series
-    lower = mean - 3 * std
-    upper = mean + 3 * std
+    lower = float(q1 - 1.5 * iqr)
+    upper = float(q3 + 1.5 * iqr)
+    print(f"iqr={iqr}, lower={lower}, upper={upper}")
     return series[(series >= lower) & (series <= upper)]
 
 
@@ -156,6 +157,11 @@ def main() -> int:
         report_lines.append(f"Subfolder: {subfolder}")
         report_lines.append(f"Samples: tiktok={a_raw.size} youtube={b_raw.size}")
 
+        plot_path_raw: Path | None = None
+        if a_raw.size > 0 and b_raw.size > 0:
+            plot_path_raw = output_dir / f"{subfolder}_violin_box_raw.png"
+            _plot_violin_box(a_raw, b_raw, plot_path_raw, f"{subfolder} Package Energy Delta (Raw)")
+
         if a_raw.size < 2 or b_raw.size < 2:
             report_lines.append("Not enough samples for statistics.")
             (output_dir / f"{subfolder}_report.txt").write_text("\n".join(report_lines))
@@ -178,9 +184,10 @@ def main() -> int:
             removed_b = int(b_raw.size - b_clean.size)
             stat_a2, p_a2, normal_a2 = _shapiro(a_clean, args.alpha)
             stat_b2, p_b2, normal_b2 = _shapiro(b_clean, args.alpha)
-            report_lines.append("Normality (after 3-sigma outlier removal):")
+            report_lines.append("Normality (after 1.5x IQR outlier removal):")
             report_lines.append(f"tiktok: W={stat_a2:.6g} p={p_a2:.6g} normal={normal_a2}")
             report_lines.append(f"youtube: W={stat_b2:.6g} p={p_b2:.6g} normal={normal_b2}")
+
             report_lines.append(f"Outliers removed: tiktok={removed_a} youtube={removed_b}")
             if not (normal_a2 and normal_b2):
                 report_lines.append("Normality still failed: experiment should be repeated.")
@@ -210,10 +217,18 @@ def main() -> int:
         report_path = output_dir / f"{subfolder}_report.txt"
         report_path.write_text("\n".join(report_lines))
 
-        plot_path = output_dir / f"{subfolder}_violin_box.png"
-        _plot_violin_box(a_clean, b_clean, plot_path, f"{subfolder} Package Energy Delta")
+        plot_path_clean = output_dir / f"{subfolder}_violin_box_clean.png"
+        _plot_violin_box(
+            a_clean,
+            b_clean,
+            plot_path_clean,
+            f"{subfolder} Package Energy Delta (Cleaned)",
+        )
 
-        print(f"{subfolder}: wrote {report_path} and {plot_path}")
+        if plot_path_raw is None:
+            print(f"{subfolder}: wrote {report_path} and {plot_path_clean}")
+        else:
+            print(f"{subfolder}: wrote {report_path}, {plot_path_raw} and {plot_path_clean}")
 
     return 0
 

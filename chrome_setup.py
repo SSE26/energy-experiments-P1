@@ -8,19 +8,26 @@ import os
 import argparse
 
 # ── Experiment constants ──────────────────────────────────────────────────────
-DURATION = 60
-WARMUP_TIME = 5
-SCROLL_INTERVAL = 10
+DURATION = 30           # must match chrome_measure.py
+WARMUP_TIME = 2
+SCROLL_INTERVAL = 5     # seconds spent on each video before scrolling to the next
 
 COLOR_SCHEME = "dark"
-VIDEO_QUALITY = 720
+VIDEO_QUALITY = 1080
+
+URLS = {
+    "tiktok": "https://www.tiktok.com/@realmadrid/video/7607975899702643990",
+    "youtube": "https://youtube.com/shorts/7F9ppUhh9yo?si=tcRMpvMWj1b4SCEf",
+}
 
 OUTPUT_DIR = "measurements"
 
-URLS = {
-    "tiktok": "https://www.tiktok.com/@realmadrid/video/7607975286549908758?lang=en",
-    "youtube": "https://www.youtube.com/shorts/4e-mPero4ls"
-}
+# flag file watched by chrome_measure.py to know when to start measuring
+READY_SIGNAL = ".measurement_ready"
+
+# Remove any stale signal from a previous crashed run
+if os.path.exists(READY_SIGNAL):
+    os.remove(READY_SIGNAL)
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -36,7 +43,6 @@ def setup_chrome():
 
 def close_tiktok_popups(driver):
     """Close all TikTok-specific popups and banners"""
-    # Close the puzzle slider popup
     try:
         close_puzzle = WebDriverWait(driver, 2).until(
             EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Close']"))
@@ -47,7 +53,6 @@ def close_tiktok_popups(driver):
     except:
         pass
 
-    # Close the GDPR "Got it" banner
     try:
         got_it = WebDriverWait(driver, 2).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'TUXButton--primary') and .//div[@class='TUXButton-label' and text()='Got it']]"))
@@ -58,7 +63,6 @@ def close_tiktok_popups(driver):
     except:
         pass
     
-    # Close the cookie banner by clicking "Decline optional cookies" (inside shadow DOM)
     try:
         WebDriverWait(driver, 3).until(
             lambda d: d.execute_script(
@@ -98,15 +102,15 @@ def unmute_video(driver, platform):
     except:
         print("Video already unmuted or button not found.")
 
-def run_experiment(platform):
-    """Run the doomscrolling experiment"""
+def run_setup(platform):
+    """Run the setup phase"""
     driver = None
 
     try:
         driver = setup_chrome()
         
         url = URLS[platform]
-        print(f"\nStarting experiment: CHROME + {platform.upper()}")
+        print(f"\nStarting setup: CHROME + {platform.upper()}")
         print(f"URL: {url}")
         print("Navigating...")
         
@@ -139,35 +143,38 @@ def run_experiment(platform):
         print(f"Warming up for {WARMUP_TIME} s...")
         time.sleep(WARMUP_TIME)
         
-        print("Ready. Starting measurement...")
+        # ── Write signal: setup is done, browser is in steady state ──────────────
+        open(READY_SIGNAL, "w").close()
+        print("Ready. Doomscrolling starting now...")
         
-        # ── Scroll every SCROLL_INTERVAL seconds for DURATION seconds ──────────────
+        # Scroll every SCROLL_INTERVAL seconds for DURATION seconds
         for i in range(DURATION // SCROLL_INTERVAL):
             time.sleep(SCROLL_INTERVAL)
-            
-            # Close any popups that appear during scrolling
-            if platform == "tiktok":
-                close_tiktok_popups(driver)
             
             # Scroll to next video
             if platform == "tiktok":
                 driver.find_element(By.TAG_NAME, "body").send_keys(Keys.PAGE_DOWN)
             elif platform == "youtube":
-                WebDriverWait(driver, 1).until(
-                    EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Next video']"))
-                ).click()
-            print(f"  → Scrolled at t={SCROLL_INTERVAL * (i + 1)} s")
+                try:
+                    WebDriverWait(driver, 1).until(
+                        EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Next video']"))
+                    ).click()
+                except:
+                    driver.find_element(By.TAG_NAME, "body").send_keys(Keys.PAGE_DOWN)
+            
+            print(f"  → Video {i + 2} at t={SCROLL_INTERVAL * (i + 1)} s")
         
-        print("Measurement complete.")
+        os.remove(READY_SIGNAL)
+        print("Setup complete.")
     
     finally:
         if driver:
             driver.quit()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Energy measurement experiment for social media platforms")
+    parser = argparse.ArgumentParser(description="Setup phase for energy measurement experiment")
     parser.add_argument("platform", choices=["tiktok", "youtube"], help="Platform to test")
 
     args = parser.parse_args()
 
-    run_experiment(args.platform)
+    run_setup(args.platform)
